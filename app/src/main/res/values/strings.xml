@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">TaskMaster Final Project</string>
+
+    <string name="add_task_title">Add New Task</string>
+    <string name="hint_task_title">Task title</string>
+    <string name="hint_task_description">Description</string>
+    <string name="hint_task_due_date">Due date (e.g. 2025-12-31)</string>
+    <string name="label_priority">Priority</string>
+    <string name="button_save">Save</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="save_not_implemented">Save not implemented yet</string>
+    <string name="completed_tasks_title">Completed Tasks</string>
+    <string name="button_view_completed">View Completed Tasks</string>
+    <string name="button_restore">Restore</string>
+    <string name="no_completed_tasks">No completed tasks yet</string>
+    <string name="button_mark_complete">Done</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_remind_before_label">Notify before task time</string>
+    <string name="remind_before_at_time">At time</string>
+    <string name="remind_before_5m">5 minutes before</string>
+    <string name="remind_before_10m">10 minutes before</string>
+    <string name="remind_before_30m">30 minutes before</string>
+    <string name="remind_before_60m">60 minutes before</string>
+    <string name="settings_saved">Settings saved</string>
+
+    <string-array name="task_priority_entries">
+        <item>1 - Low</item>
+        <item>2 - Medium</item>
+        <item>3 - High</item>
+    </string-array>
+</resources>
