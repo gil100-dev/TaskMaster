@@ -2,16 +2,15 @@ package com.example.taskmasterfinalproject.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.taskmasterfinalproject.R
 import com.example.taskmasterfinalproject.model.Task
-import com.google.android.material.card.MaterialCardView
 
 class TaskAdapter(
     private var items: List<Task>,
-    private val onTaskCompleted: (Task) -> Unit,
-    private val onTaskClicked: (Task) -> Unit
+    private val onTaskClick: (Task) -> Unit, // New callback
+    private val onTaskComplete: (Task) -> Unit,
+    private val onTaskDelete: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -22,52 +21,34 @@ class TaskAdapter(
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = items[position]
-        holder.titleText.text = task.title ?: "Task Title Placeholder"
+        holder.titleText.text = task.title ?: "Task"
         holder.descriptionText.text = task.description ?: ""
-
-        val priorityText = when (task.priority) {
-            1 -> "Priority: Low"
-            2 -> "Priority: Medium"
-            3 -> "Priority: High"
-            else -> "Priority: None"
+        holder.priorityText.text = when (task.priority) {
+            1 -> "Low"
+            2 -> "Medium"
+            3 -> "High"
+            else -> "None"
         }
-        holder.priorityText.text = priorityText
-
-        val dueDateLabel = if (!task.dueDate.isNullOrBlank()) {
-            "Due: ${task.dueDate}"
-        } else {
-            ""
-        }
-        holder.dueDateText.text = dueDateLabel
+        holder.dueDateText.text = if (task.dueDate.isNullOrBlank()) "" else "Due: ${task.dueDate}"
 
         holder.completeButton.setOnClickListener {
-            onTaskCompleted(task)
+            onTaskComplete(task)
         }
 
+        // Set click listener on the whole item view
         holder.itemView.setOnClickListener {
-            onTaskClicked(task)
+            onTaskClick(task)
         }
-
-        val cardView = holder.itemView as? MaterialCardView
-        val colorRes = when (task.priority) {
-            3 -> R.color.task_card_high_bg
-            2 -> R.color.task_card_medium_bg
-            1 -> R.color.task_card_low_bg
-            else -> android.R.color.white
-        }
-        cardView?.setCardBackgroundColor(
-            ContextCompat.getColor(holder.itemView.context, colorRes)
-        )
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun getTask(position: Int): Task {
+        return items[position]
+    }
 
     fun submitList(newItems: List<Task>) {
         items = newItems
         notifyDataSetChanged()
     }
-
-    fun getTask(position: Int): Task = items[position]
 }
-
-

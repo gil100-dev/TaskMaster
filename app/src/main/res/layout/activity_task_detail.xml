@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".details.TaskDetailActivity">
+
+    <TextView
+        android:id="@+id/text_task_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:textAppearance="?attr/textAppearanceHeadline5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Task Title" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_tags"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/text_task_title"
+        app:layout_constraintStart_toStartOf="@+id/text_task_title"
+        app:layout_constraintTop_toBottomOf="@+id/text_task_title" />
+
+    <TextView
+        android:id="@+id/label_subtasks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Subtasks"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        app:layout_constraintStart_toStartOf="@+id/text_task_title"
+        app:layout_constraintTop_toBottomOf="@+id/chip_group_tags" />
+
+    <TextView
+        android:id="@+id/text_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceBody2"
+        app:layout_constraintBottom_toBottomOf="@+id/label_subtasks"
+        app:layout_constraintEnd_toEndOf="@+id/text_task_title"
+        app:layout_constraintTop_toTopOf="@+id/label_subtasks"
+        tools:text="0 / 0" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_subtasks"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/text_task_title"
+        app:layout_constraintStart_toStartOf="@+id/text_task_title"
+        app:layout_constraintTop_toBottomOf="@+id/label_subtasks" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_subtasks"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/edit_new_subtask"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progress_subtasks" />
+
+    <EditText
+        android:id="@+id/edit_new_subtask"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Add a subtask"
+        android:inputType="textCapSentences"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_add_subtask"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_add_subtask"
+        style="?attr/materialIconButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_add"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_new_subtask"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/edit_new_subtask" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

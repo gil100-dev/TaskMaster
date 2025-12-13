@@ -4,89 +4,75 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import android.widget.Toast
+import android.os.Build
+import android.provider.Settings
 import com.example.taskmasterfinalproject.model.Task
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 object ReminderScheduler {
 
     fun scheduleTaskReminder(context: Context, task: Task) {
-        val triggerAtMillis = task.dueTimeMillis ?: return
-
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        val intent = Intent(context, TaskReminderReceiver::class.java).apply {
-            putExtra(TaskReminderReceiver.EXTRA_TASK_ID, task.id)
-            putExtra(TaskReminderReceiver.EXTRA_TASK_TITLE, task.title)
-            putExtra(TaskReminderReceiver.EXTRA_TASK_DESCRIPTION, task.description)
-            putExtra(TaskReminderReceiver.EXTRA_TASK_PRIORITY, task.priority ?: 0)
+        // Check for permission before scheduling
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            // Optional: You could log this or handle it silently.
+            // The alarm will be inexact because the fallback logic will be used.
         }
 
-        val requestCode = task.id.hashCode()
+        val intent = Intent(context, TaskReminderReceiver::class.java).apply {
+            putExtra("task_id", task.id)
+            putExtra("task_title", task.title)
+            putExtra("task_description", task.description)
+        }
+
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            requestCode,
+            task.id.hashCode(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        Log.d(
-            "ReminderScheduler",
-            "scheduleTaskReminder: id=${task.id}, triggerAt=$triggerAtMillis, now=${System.currentTimeMillis()}"
-        )
-
-        if (triggerAtMillis > System.currentTimeMillis()) {
+        task.dueTimeMillis?.let {
             try {
-                Log.d(
-                    "ReminderScheduler",
-                    "Trying setExactAndAllowWhileIdle for task ${task.id} at $triggerAtMillis"
-                )
-                Toast.makeText(context, "Alarm set for this task", Toast.LENGTH_SHORT).show()
-
-                // פה אנדרואיד 16 עלול לזרוק SecurityException אם אין הרשאת exact alarm
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerAtMillis,
-                    pendingIntent
-                )
-            } catch (se: SecurityException) {
-                // אין הרשאה ל-exact alarm – נופלים לפתרון עוקף ולא מקריסים את האפליקציה
-                Log.e(
-                    "ReminderScheduler",
-                    "Exact alarm not allowed, falling back to set(): ${se.message}"
-                )
-                Toast.makeText(
-                    context,
-                    "Exact alarm not allowed, using regular alarm instead",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                alarmManager.set(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerAtMillis,
-                    pendingIntent
-                )
+                // Use the best available API when permission is granted
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, it, pendingIntent)
+            } catch (e: SecurityException) {
+                // Fallback for edge cases or devices where the permission check is insufficient
+                alarmManager.set(AlarmManager.RTC_WAKEUP, it, pendingIntent)
             }
-        } else {
-            Log.d(
-                "ReminderScheduler",
-                "Not scheduling alarm, due time is in the past for task ${task.id}"
-            )
         }
     }
 
     fun cancelTaskReminder(context: Context, task: Task) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, TaskReminderReceiver::class.java)
-        val requestCode = task.id.hashCode()
-
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            requestCode,
+            task.id.hashCode(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
         alarmManager.cancel(pendingIntent)
+    }
+
+    fun requestExactAlarmPermissionIfNeeded(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                // Explain to the user why this is needed
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Permission Required")
+                    .setMessage("To ensure task reminders are sent exactly on time, TaskMaster needs permission to schedule exact alarms.")
+                    .setPositiveButton("Go to Settings") { _, _ ->
+                        Intent().also {
+                            it.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                            context.startActivity(it)
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
     }
 }

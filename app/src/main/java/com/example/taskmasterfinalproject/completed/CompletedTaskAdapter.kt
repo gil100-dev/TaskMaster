@@ -1,5 +1,6 @@
 package com.example.taskmasterfinalproject.completed
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -7,8 +8,7 @@ import com.example.taskmasterfinalproject.R
 import com.example.taskmasterfinalproject.model.Task
 
 class CompletedTaskAdapter(
-    private var items: List<Task>,
-    private val onTaskRestore: (Task) -> Unit
+    private var items: List<Task>
 ) : RecyclerView.Adapter<CompletedTaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompletedTaskViewHolder {
@@ -20,26 +20,8 @@ class CompletedTaskAdapter(
     override fun onBindViewHolder(holder: CompletedTaskViewHolder, position: Int) {
         val task = items[position]
         holder.titleText.text = task.title ?: "Task"
-        holder.descriptionText.text = task.description ?: ""
-
-        val priorityText = when (task.priority) {
-            1 -> "Priority: Low"
-            2 -> "Priority: Medium"
-            3 -> "Priority: High"
-            else -> "Priority: None"
-        }
-        holder.priorityText.text = priorityText
-
-        val dueDateLabel = if (!task.dueDate.isNullOrBlank()) {
-            "Due: ${task.dueDate}"
-        } else {
-            ""
-        }
-        holder.dueDateText.text = dueDateLabel
-
-        holder.restoreButton.setOnClickListener {
-            onTaskRestore(task)
-        }
+        holder.titleText.paintFlags = holder.titleText.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        holder.checkBox.isChecked = true
     }
 
     override fun getItemCount(): Int = items.size
@@ -49,5 +31,3 @@ class CompletedTaskAdapter(
         notifyDataSetChanged()
     }
 }
-
-

@@ -6,12 +6,12 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tasks")
 data class Task(
     @PrimaryKey val id: String,
-    val title: String? = null,
-    val description: String? = null,
-    val dueDate: String? = null,
-    val priority: Int? = null,
-    val dueTimeMillis: Long? = null,
-    val isCompleted: Boolean = false
+    val title: String?,
+    val description: String?,
+    val dueDate: String?,
+    val priority: Int?,
+    val dueTimeMillis: Long?,
+    val isCompleted: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis(),
+    val completedAt: Long? = null
 )
-
-
