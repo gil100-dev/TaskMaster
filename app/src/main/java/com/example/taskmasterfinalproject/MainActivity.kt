@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,56 +14,49 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.taskmasterfinalproject.addtask.AddTaskActivity
+import com.example.taskmasterfinalproject.databinding.ActivityMainBinding
 import com.example.taskmasterfinalproject.details.TaskDetailActivity
 import com.example.taskmasterfinalproject.main.MainViewModel
 import com.example.taskmasterfinalproject.main.TaskAdapter
 import com.example.taskmasterfinalproject.model.Task
 import com.example.taskmasterfinalproject.notifications.NotificationHelper
 import com.example.taskmasterfinalproject.notifications.ReminderScheduler
-// import com.example.taskmasterfinalproject.settings.SettingsActivity
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
-    private lateinit var taskAdapter: TaskAdapter
-
-    private val addTaskLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            if (data != null) {
-                val title = data.getStringExtra(AddTaskActivity.EXTRA_TITLE)
-                val description = data.getStringExtra(AddTaskActivity.EXTRA_DESCRIPTION)
-                val dueDate = data.getStringExtra(AddTaskActivity.EXTRA_DUE_DATE)
-                val priority = data.getIntExtra(AddTaskActivity.EXTRA_PRIORITY, 0)
-                // Correctly get the time in millis using the new key
-                val dueTimeMillis = data.getLongExtra(AddTaskActivity.EXTRA_DUE_TIME_MILLIS, -1L)
-                val millisOrNull = if (dueTimeMillis > 0) dueTimeMillis else null
-
-                val newTask = Task(
-                    id = System.currentTimeMillis().toString(),
-                    title = title,
-                    description = description,
-                    dueDate = dueDate,
-                    priority = priority,
-                    dueTimeMillis = millisOrNull
-                )
-                viewModel.addTask(newTask)
-                if (millisOrNull != null) {
-                    ReminderScheduler.scheduleTaskReminder(this, newTask)
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        com.example.taskmasterfinalproject.settings.ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_root)) { v, insets ->
+        
+        // Session Check
+        // Priority: In-Memory (just logged in) -> Persistent (Remember Me)
+        // If In-Memory is set, we are good.
+        if (!com.example.taskmasterfinalproject.auth.SessionManager.isLoggedIn()) {
+             // Not in memory, check prefs
+             val prefs = com.example.taskmasterfinalproject.data.PreferencesManager(this)
+             val savedId = prefs.getSessionUserId()
+             if (savedId != null) {
+                 // Found valid saved session, load into memory
+                 com.example.taskmasterfinalproject.auth.SessionManager.startSession(savedId)
+             } else {
+                 // No session anywhere
+                 startActivity(Intent(this, com.example.taskmasterfinalproject.auth.LoginActivity::class.java))
+                 finish()
+                 return
+             }
+        }
+        
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar) // Ensure Toolbar is set
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.mainRoot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0) // Don't pad bottom, let BottomNav handle it
             insets
         }
 
@@ -72,82 +64,32 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermissionIfNeeded()
         ReminderScheduler.requestExactAlarmPermissionIfNeeded(this)
 
-        val buttonAddTask: Button = findViewById(R.id.button_add_task)
-        val buttonOpenSettings: Button = findViewById(R.id.button_open_settings)
-        val recyclerTasks: RecyclerView = findViewById(R.id.recycler_tasks)
-
-        taskAdapter = TaskAdapter(
-            emptyList(),
-            onTaskClick = { task ->
-                val intent = Intent(this, TaskDetailActivity::class.java)
-                intent.putExtra("TASK_ID", task.id)
-                startActivity(intent)
-            },
-            onTaskComplete = { task ->
-                viewModel.markTaskCompleted(task)
-                Snackbar.make(recyclerTasks, "Task completed", Snackbar.LENGTH_LONG)
-                    .setAction("UNDO") { viewModel.addTask(task) }
-                    .show()
-            },
-            onTaskDelete = { task ->
-                viewModel.deleteTask(task)
-                Snackbar.make(recyclerTasks, "Task deleted", Snackbar.LENGTH_LONG)
-                    .setAction("UNDO") { viewModel.addTask(task) }
-                    .show()
-            }
-        )
-        recyclerTasks.layoutManager = LinearLayoutManager(this)
-        recyclerTasks.adapter = taskAdapter
-
-        setupSwipeToDelete(recyclerTasks)
-
-        viewModel.tasks.observe(this) { tasks ->
-            taskAdapter.submitList(tasks)
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, com.example.taskmasterfinalproject.main.TaskListFragment())
+                .commit()
         }
 
-        buttonAddTask.setOnClickListener {
-            val intent = Intent(this, AddTaskActivity::class.java)
-            addTaskLauncher.launch(intent)
-        }
-
-        buttonOpenSettings.setOnClickListener {
-            // val intent = Intent(this, SettingsActivity::class.java)
-            // startActivity(intent)
-        }
-    }
-
-    private fun setupSwipeToDelete(recyclerView: RecyclerView) {
-        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
-            0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val task = taskAdapter.getTask(position)
-
-                if (direction == ItemTouchHelper.LEFT) {
-                    viewModel.deleteTask(task)
-                    Snackbar.make(recyclerView, "Task deleted", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO") { viewModel.addTask(task) }
-                        .show()
-                } else if (direction == ItemTouchHelper.RIGHT) {
-                    viewModel.markTaskCompleted(task)
-                    Snackbar.make(recyclerView, "Task completed", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO") { viewModel.addTask(task) }
-                        .show()
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_tasks -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, com.example.taskmasterfinalproject.main.TaskListFragment())
+                        .commit()
+                    true
                 }
+                R.id.nav_statistics -> {
+                    // Navigate to Statistics Fragment
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, com.example.taskmasterfinalproject.statistics.StatisticsFragment())
+                        .commit()
+                    true
+                }
+                else -> false
             }
         }
+        
 
-        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -160,6 +102,26 @@ class MainActivity : AppCompatActivity() {
                     1001
                 )
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                com.example.taskmasterfinalproject.settings.SettingsBottomSheet.newInstance()
+                    .show(supportFragmentManager, com.example.taskmasterfinalproject.settings.SettingsBottomSheet.TAG)
+                true
+            }
+            R.id.action_profile -> {
+                startActivity(Intent(this, com.example.taskmasterfinalproject.profile.ProfileActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

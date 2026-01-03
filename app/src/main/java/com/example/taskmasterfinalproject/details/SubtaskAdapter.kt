@@ -9,7 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.taskmasterfinalproject.databinding.ItemSubtaskBinding
 import com.example.taskmasterfinalproject.model.Subtask
 
-class SubtaskAdapter(private val onSubtaskToggled: (Subtask) -> Unit) :
+class SubtaskAdapter(
+    private val onSubtaskToggled: (Subtask) -> Unit,
+    private val onSubtaskDeleted: (Subtask) -> Unit
+) :
     ListAdapter<Subtask, SubtaskAdapter.SubtaskViewHolder>(SubtaskDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskViewHolder {
@@ -34,6 +37,10 @@ class SubtaskAdapter(private val onSubtaskToggled: (Subtask) -> Unit) :
 
             binding.checkboxSubtask.setOnClickListener {
                 onSubtaskToggled(subtask)
+            }
+            
+            binding.buttonDeleteSubtask.setOnClickListener {
+                onSubtaskDeleted(subtask)
             }
         }
     }

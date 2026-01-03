@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -15,8 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskMasterFinalProject">
+
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.taskmasterfinalproject.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,16 +26,45 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
         <activity
-            android:name=".addtask.AddTaskActivity"
+            android:name="com.example.taskmasterfinalproject.addtask.AddTaskActivity"
             android:exported="false" />
+            
         <activity
-            android:name=".settings.SettingsActivity"
+            android:name="com.example.taskmasterfinalproject.details.TaskDetailActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.taskmasterfinalproject.MainActivity" />
+
+        <activity
+            android:name="com.example.taskmasterfinalproject.auth.LoginActivity"
             android:exported="false" />
 
-        <receiver
-            android:name=".notifications.TaskReminderReceiver"
+        <activity
+            android:name="com.example.taskmasterfinalproject.auth.RegisterActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.example.taskmasterfinalproject.profile.ProfileActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.taskmasterfinalproject.MainActivity" />
+
+        <receiver
+            android:name="com.example.taskmasterfinalproject.notifications.TaskReminderReceiver"
+            android:exported="false" />
+            
+        <receiver
+            android:name="com.example.taskmasterfinalproject.widget.UrgentTasksWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/urgent_widget_info" />
+        </receiver>
+            
     </application>
 
 </manifest>

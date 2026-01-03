@@ -20,6 +20,9 @@ interface TaskDao {
     @Update
     suspend fun updateTask(task: Task)
 
+    @Query("SELECT * FROM tasks")
+    suspend fun getTasksList(): List<Task>
+
     @Delete
     suspend fun deleteTask(task: Task)
 
@@ -28,8 +31,16 @@ interface TaskDao {
     fun getTaskWithDetails(taskId: String): Flow<TaskWithDetails>
 
     @Transaction
-    @Query("SELECT * FROM tasks ORDER BY createdAt DESC") // A default query, will be filtered in repository
+    @Query("SELECT * FROM tasks ORDER BY createdAt DESC") // Default
     fun getAllTasksWithDetails(): Flow<List<TaskWithDetails>>
+
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE (isCompleted = 0 OR :includeCompleted = 1) ORDER BY dueDate ASC, createdAt DESC")
+    fun getTasksSortedByDate(includeCompleted: Boolean): Flow<List<TaskWithDetails>>
+
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE (isCompleted = 0 OR :includeCompleted = 1) ORDER BY priority DESC, createdAt DESC")
+    fun getTasksSortedByPriority(includeCompleted: Boolean): Flow<List<TaskWithDetails>>
 
     // --- Subtask Methods ---
     @Insert(onConflict = OnConflictStrategy.REPLACE)

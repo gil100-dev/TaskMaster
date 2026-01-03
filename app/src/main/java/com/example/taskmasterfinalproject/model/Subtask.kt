@@ -14,7 +14,8 @@ import java.util.UUID
             childColumns = ["taskId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [androidx.room.Index("taskId")]
 )
 data class Subtask(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),

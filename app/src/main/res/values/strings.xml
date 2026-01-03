@@ -17,4 +17,26 @@
         <item>2 - Medium</item>
         <item>3 - High</item>
     </string-array>
+    
+    <string name="completion_rate_format">%d%%</string>
+    <string name="no_tasks_message">No tasks found. Add one!</string>
+    <string name="add_subtask">Add a subtask</string>
+    
+    <!-- Auth Strings -->
+    <string name="login_title">Login</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="remember_me">Remember me</string>
+    <string name="action_login">Login</string>
+    <string name="action_register">Register</string>
+    <string name="error_fill_fields">Please fill all fields</string>
+    
+    <!-- Profile Strings -->
+    <string name="profile_title">Profile</string>
+    <string name="action_change_password">Change Password</string>
+    <string name="action_logout">Logout</string>
+    <string name="hint_old_password">Old Password</string>
+    <string name="hint_new_password">New Password</string>
+    <string name="password_changed">Password changed successfully</string>
+    <string name="settings_title">Settings</string>
 </resources>

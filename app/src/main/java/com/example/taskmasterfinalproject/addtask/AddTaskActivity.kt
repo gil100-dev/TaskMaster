@@ -6,11 +6,10 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import com.example.taskmasterfinalproject.R
+import com.example.taskmasterfinalproject.databinding.ActivityAddTaskBinding
+import com.example.taskmasterfinalproject.util.setupBackNavigation
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -22,34 +21,32 @@ class AddTaskActivity : AppCompatActivity() {
         const val EXTRA_DESCRIPTION = "extra_task_description"
         const val EXTRA_DUE_DATE = "extra_task_due_date"
         const val EXTRA_PRIORITY = "extra_task_priority"
-        const val EXTRA_DUE_TIME_MILLIS = "extra_due_time_millis" // New constant
+        const val EXTRA_DUE_TIME_MILLIS = "extra_due_time_millis"
     }
 
-    private lateinit var titleEditText: EditText
-    private lateinit var descriptionEditText: EditText
-    private lateinit var dueDateEditText: EditText
-    private lateinit var prioritySpinner: Spinner
-    private lateinit var saveButton: Button
-    private lateinit var cancelButton: Button
-    private var dueTimeInMillis: Long? = null // New member variable
+    private lateinit var binding: ActivityAddTaskBinding
+    private var dueTimeInMillis: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        com.example.taskmasterfinalproject.settings.ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_task)
+        binding = ActivityAddTaskBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        titleEditText = findViewById(R.id.edit_task_title)
-        descriptionEditText = findViewById(R.id.edit_task_description)
-        dueDateEditText = findViewById(R.id.edit_task_due_date)
-        prioritySpinner = findViewById(R.id.spinner_task_priority)
-        saveButton = findViewById(R.id.button_save_task)
-        cancelButton = findViewById(R.id.button_cancel_task)
-
-        dueDateEditText.setOnClickListener {
+        binding.editTaskDueDate.setOnClickListener {
             showDateTimePicker()
         }
+        
+        // Setup Toolbar
+        setupBackNavigation(binding.toolbar, getString(R.string.add_task_title))
 
         setupPrioritySpinner()
         setupButtons()
+    }
+    
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressedDispatcher.onBackPressed()
+        return true
     }
 
     private fun setupPrioritySpinner() {
@@ -60,7 +57,7 @@ class AddTaskActivity : AppCompatActivity() {
             priorities
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        prioritySpinner.adapter = adapter
+        binding.spinnerTaskPriority.adapter = adapter
     }
 
     private fun showDateTimePicker() {
@@ -80,7 +77,7 @@ class AddTaskActivity : AppCompatActivity() {
 
                 val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
                 val formatted = formatter.format(calendar.time)
-                dueDateEditText.setText(formatted)
+                binding.editTaskDueDate.setText(formatted)
             }
 
             TimePickerDialog(
@@ -102,16 +99,21 @@ class AddTaskActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        cancelButton.setOnClickListener {
+        binding.buttonCancelTask.setOnClickListener {
+            setResult(Activity.RESULT_CANCELED)
             finish()
         }
 
-        saveButton.setOnClickListener {
-            val title = titleEditText.text.toString()
-            val description = descriptionEditText.text.toString()
-            val dueDate = dueDateEditText.text.toString()
+        binding.buttonSaveTask.setOnClickListener {
+            val title = binding.editTaskTitle.text.toString()
+            if (title.isBlank()) {
+                binding.editTaskTitle.error = getString(R.string.error_empty_title)
+                return@setOnClickListener
+            }
+            val description = binding.editTaskDescription.text.toString()
+            val dueDate = binding.editTaskDueDate.text.toString()
 
-            val selectedPosition = prioritySpinner.selectedItemPosition
+            val selectedPosition = binding.spinnerTaskPriority.selectedItemPosition
             val priority = if (selectedPosition in 0..2) selectedPosition + 1 else 0
 
             val resultIntent = Intent().apply {
@@ -119,7 +121,6 @@ class AddTaskActivity : AppCompatActivity() {
                 putExtra(EXTRA_DESCRIPTION, description)
                 putExtra(EXTRA_DUE_DATE, dueDate)
                 putExtra(EXTRA_PRIORITY, priority)
-                // Add the time in millis using the new key
                 putExtra(EXTRA_DUE_TIME_MILLIS, dueTimeInMillis ?: -1L)
             }
 

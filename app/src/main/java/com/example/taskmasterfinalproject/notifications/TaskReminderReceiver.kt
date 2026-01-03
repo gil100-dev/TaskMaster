@@ -14,11 +14,14 @@ class TaskReminderReceiver : BroadcastReceiver() {
         val title = if (taskTitle.isNullOrBlank()) "Task Reminder" else taskTitle
         val description = if (taskDescription.isNullOrBlank()) "Your task is due." else taskDescription
 
+        val priority = intent.getIntExtra("task_priority", 0)
+
         NotificationHelper.showTaskReminderNotification(
             context,
             taskId ?: "",
             title,
-            description
+            description,
+            priority
         )
     }
 }

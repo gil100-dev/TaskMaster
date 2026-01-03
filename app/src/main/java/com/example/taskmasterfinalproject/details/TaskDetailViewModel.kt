@@ -20,10 +20,22 @@ class TaskDetailViewModel(private val repository: TaskRepository, private val ta
         }
     }
 
+    fun restoreSubtask(subtask: Subtask) {
+        viewModelScope.launch {
+            repository.insertSubtask(subtask)
+        }
+    }
+
     fun toggleSubtask(subtask: Subtask) {
         viewModelScope.launch {
             val updatedSubtask = subtask.copy(isDone = !subtask.isDone)
             repository.updateSubtask(updatedSubtask)
+        }
+    }
+
+    fun deleteSubtask(subtask: Subtask) {
+        viewModelScope.launch {
+            repository.deleteSubtask(subtask)
         }
     }
 }

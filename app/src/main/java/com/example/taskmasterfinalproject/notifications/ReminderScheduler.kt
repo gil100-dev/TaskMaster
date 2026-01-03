@@ -24,6 +24,7 @@ object ReminderScheduler {
             putExtra("task_id", task.id)
             putExtra("task_title", task.title)
             putExtra("task_description", task.description)
+            putExtra("task_priority", task.priority)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
