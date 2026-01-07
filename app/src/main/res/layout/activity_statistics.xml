@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/text_stats_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dashboard"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/text_stats_title">
+
+            <!-- Row 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="?attr/materialCardViewFilledStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:text="Total Tasks"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/text_total_tasks"
+                            tools:text="12"
+                            android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                            android:layout_marginTop="8dp"
+                            android:textColor="?attr/colorPrimary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="?attr/materialCardViewFilledStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:text="Completed"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/text_completed_tasks"
+                            tools:text="8"
+                            android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                            android:layout_marginTop="8dp"
+                            android:textColor="?attr/colorSecondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Row 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="?attr/materialCardViewFilledStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:text="Active"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/text_active_tasks"
+                            tools:text="4"
+                            android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="?attr/materialCardViewFilledStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="?attr/colorPrimaryContainer">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:text="Completion"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/text_completion_rate"
+                            tools:text="75%"
+                            android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                            android:layout_marginTop="8dp"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Row 3: Insights -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="?attr/materialCardViewFilledStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="?attr/colorErrorContainer">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:text="Urgent Tasks"
+                                android:textAppearance="?attr/textAppearanceLabelLarge"
+                                android:textColor="?attr/colorOnErrorContainer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                android:text="High Priority &amp; Pending"
+                                android:textAppearance="?attr/textAppearanceBodySmall"
+                                android:textColor="?attr/colorOnErrorContainer"
+                                android:alpha="0.8"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/text_high_priority"
+                            tools:text="3"
+                            android:textAppearance="?attr/textAppearanceDisplaySmall"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnErrorContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

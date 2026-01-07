@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TaskMaster</string>
+    <string name="add_task_title">הוסף משימה חדשה</string>
+    <string name="hint_task_title">כותרת המשימה</string>
+    <string name="hint_task_description">תיאור</string>
+    <string name="hint_task_due_date">תאריך יעד (לדוגמה 2025-12-31)</string>
+    <string name="label_priority">עדיפות</string>
+    <string name="button_save">שמור</string>
+    <string name="button_cancel">ביטול</string>
+    <string name="save_not_implemented">שמירה לא מומשה עדיין</string>
+    <string name="completed_tasks_title">משימות שהושלמו</string>
+    <string name="button_view_completed">הצג משימות שהושלמו</string>
+    <string name="no_tasks_message">לא נמצאו משימות. הוסף אחת!</string>
+    <string name="add_subtask">הוסף תת-משימה</string>
+    <string name="error_empty_title">הכותרת לא יכולה להיות ריקה</string>
+</resources>

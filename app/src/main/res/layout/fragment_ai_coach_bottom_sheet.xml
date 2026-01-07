@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="?android:colorBackground">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/btn_star_big_on"
+            app:tint="?attr/colorPrimary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="AI Task Coach"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Body -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="100dp">
+
+        <ProgressBar
+            android:id="@+id/progressBarAi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/textAiResponse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="I can help you break down this task or provide motivation. Tap 'Ask' to start."
+                android:textAppearance="?attr/textAppearanceBodyMedium" />
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
+
+    <!-- Plan Preview Section -->
+    <LinearLayout
+        android:id="@+id/layoutPlanPreview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:background="?attr/colorSurfaceVariant"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suggested Subtasks"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+             android:id="@+id/textPlanSummary"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:fontFamily="monospace"
+             android:textSize="12sp"
+             android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+             <Button
+                android:id="@+id/btnDiscard"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Discard"
+                android:textColor="?attr/colorError"/>
+
+             <Button
+                android:id="@+id/btnApply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apply Plan" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Footer Actions -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btnGenerateSubtasks"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Create Subtasks" />
+
+        <Button
+            android:id="@+id/btnRegenerate"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Regenerate Advice" />
+
+        <Button
+            android:id="@+id/btnClose"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close" />
+    </LinearLayout>
+
+</LinearLayout>
