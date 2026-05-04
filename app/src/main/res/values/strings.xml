@@ -1,42 +1,63 @@
 <resources>
     <string name="app_name">TaskMaster Final Project</string>
 
-    <string name="add_task_title">Add New Task</string>
-    <string name="hint_task_title">Task title</string>
-    <string name="hint_task_description">Description</string>
-    <string name="hint_task_due_date">Due date (e.g. 2025-12-31)</string>
-    <string name="label_priority">Priority</string>
-    <string name="button_save">Save</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="save_not_implemented">Save not implemented yet</string>
-    <string name="completed_tasks_title">Completed Tasks</string>
-    <string name="button_view_completed">View Completed Tasks</string>
+    <string name="add_task_title">הוסף משימה חדשה</string>
+    <string name="hint_task_title">כותרת המשימה</string>
+    <string name="hint_task_description">תיאור</string>
+    <string name="hint_task_due_date">תאריך יעד (לדוגמה 2025-12-31)</string>
+    <string name="label_priority">עדיפות</string>
+    <string name="button_save">שמור</string>
+    <string name="button_cancel">ביטול</string>
+    <string name="save_not_implemented">שמירה לא מומשה עדיין</string>
+    <string name="completed_tasks_title">משימות שהושלמו</string>
+    <string name="button_view_completed">הצג משימות שהושלמו</string>
 
     <string-array name="task_priority_entries">
-        <item>1 - Low</item>
-        <item>2 - Medium</item>
-        <item>3 - High</item>
+        <item>1 - נמוכה</item>
+        <item>2 - בינונית</item>
+        <item>3 - גבוהה</item>
     </string-array>
     
     <string name="completion_rate_format">%d%%</string>
-    <string name="no_tasks_message">No tasks found. Add one!</string>
-    <string name="add_subtask">Add a subtask</string>
+    <string name="no_tasks_message">לא נמצאו משימות. הוסף אחת!</string>
+    <string name="add_subtask">הוסף תת-משימה</string>
     
     <!-- Auth Strings -->
-    <string name="login_title">Login</string>
-    <string name="hint_username">Username</string>
-    <string name="hint_password">Password</string>
-    <string name="remember_me">Remember me</string>
-    <string name="action_login">Login</string>
-    <string name="action_register">Register</string>
-    <string name="error_fill_fields">Please fill all fields</string>
+    <string name="login_title">כניסה</string>
+    <string name="hint_username">שם משתמש</string>
+    <string name="hint_password">סיסמה</string>
+    <string name="hint_confirm_password">אמת סיסמה</string>
+    <string name="remember_me">זכור אותי</string>
+    <string name="action_login">כניסה</string>
+    <string name="action_register">הרשמה</string>
+    <string name="action_create_account">צור חשבון</string>
+    <string name="action_back_to_login">חזרה לכניסה</string>
+    <string name="error_fill_fields">נא למלא את כל השדות</string>
+    <string name="error_password_mismatch">הסיסמאות אינן תואמות</string>
+    <string name="error_username_exists">שם המשתמש כבר קיים</string>
+    <string name="msg_register_success">החשבון נוצר בהצלחה! נא להתחבר.</string>
     
     <!-- Profile Strings -->
-    <string name="profile_title">Profile</string>
-    <string name="action_change_password">Change Password</string>
-    <string name="action_logout">Logout</string>
-    <string name="hint_old_password">Old Password</string>
-    <string name="hint_new_password">New Password</string>
-    <string name="password_changed">Password changed successfully</string>
-    <string name="settings_title">Settings</string>
+    <string name="profile_title">פרופיל</string>
+    <string name="action_change_password">שנה סיסמה</string>
+    <string name="action_logout">התנתק</string>
+    <string name="hint_old_password">סיסמה ישנה</string>
+    <string name="hint_new_password">סיסמה חדשה</string>
+    <string name="msg_password_changed">הסיסמה שונתה בהצלחה</string>
+    <string name="password_changed">הסיסמה שונתה בהצלחה</string>
+    <string name="settings_title">הגדרות</string>
+
+    <!-- TTS Strings -->
+    <string name="speak_task">הקרא משימה</string>
+    <string name="tts_task_prefix">משימה: </string>
+    <string name="tts_description_prefix">תיאור: </string>
+    <string name="tts_due_date_prefix">תאריך יעד: </string>
+
+    <!-- STT Strings -->
+    <string name="voice_input">קלט קולי</string>
+    <string name="voice_input_hint">לחץ על המיקרופון ודבר את המשימה</string>
+    <string name="stt_no_speech">לא זוהה דיבור, נסה שוב</string>
+    <string name="stt_error">שגיאה בזיהוי דיבור</string>
+    <string name="stt_not_available">זיהוי דיבור אינו זמין במכשיר זה</string>
+    <string name="stt_overwrite_confirm">להחליף את הטקסט הקיים?</string>
 </resources>

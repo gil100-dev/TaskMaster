@@ -1,46 +1,75 @@
 package com.example.taskmasterfinalproject.main
 
+// ספרייה ליצירת דיאלוגים (חלונות קופצים)
 import android.app.AlertDialog
+// ספרייה ליצירת Intents למעבר בין מסכים
 import android.content.Intent
+// ספרייה לציור גרפי על גבי קנבס
 import android.graphics.Canvas
+// ספרייה לניהול צבעים
 import android.graphics.Color
+// ספרייה להגדרת סגנונות ציור (מברשת)
 import android.graphics.Paint
+// ספרייה להעברת נתונים (Bundle)
 import android.os.Bundle
+// ספרייה לניהול יצירת Views
 import android.view.LayoutInflater
+// ספרייה המייצגת אלמנט תצוגה
 import android.view.View
+// ספרייה המייצגת קבוצת Views
 import android.view.ViewGroup
+// ספרייה לניהול אירועי בחירה ברשימות/ספינרים
 import android.widget.AdapterView
+// ספרייה לקישור מערך נתונים לתצוגה (Adapter פשוט)
 import android.widget.ArrayAdapter
+// מחלקת בסיס ל-Fragment (חלק ממסך)
 import androidx.fragment.app.Fragment
+// ספרייה לשיתוף ViewModel עם ה-Activity המארח
 import androidx.fragment.app.activityViewModels
+// ספרייה לניהול אינטראקציות גרירה והחלקה ב-RecyclerView
 import androidx.recyclerview.widget.ItemTouchHelper
+// מנהל תצוגה ליניארי עבור RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+// ספרייה לרכיב ה-RecyclerView (רשימה נגללת)
 import androidx.recyclerview.widget.RecyclerView
+// משאבי האפליקציה
 import com.example.taskmasterfinalproject.R
+// Activity להוספת משימה חדשה
 import com.example.taskmasterfinalproject.addtask.AddTaskActivity
+// מחלקת ה-Binding של הפרגמנט
 import com.example.taskmasterfinalproject.databinding.FragmentTaskListBinding
+// Activity להצגת פרטי משימה
 import com.example.taskmasterfinalproject.details.TaskDetailActivity
+// המודל המייצג אפשרויות מיון
 import com.example.taskmasterfinalproject.model.SortOption
+// מנהל טקסט-לדיבור (TTS)
+import com.example.taskmasterfinalproject.audio.TextToSpeechManager
+// רכיב להצגת הודעות קצרות בתחתית המסך
 import com.google.android.material.snackbar.Snackbar
 
+// מחלקה עוטפת ל-Binding, לשימוש פנימי
 class TaskListBindingWrapper(val binding: FragmentTaskListBinding)
 
+// פרגמנט המציג את רשימת המשימות הראשית
 class TaskListFragment : Fragment() {
 
     private var _binding: FragmentTaskListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: MainViewModel by activityViewModels() // Share ViewModel with Host
+    private val viewModel: MainViewModel by activityViewModels() // משתף ViewModel עם ה-Host
     private lateinit var taskAdapter: TaskAdapter
+    // מופע של מנהל הטקסט-לדיבור
+    private var ttsManager: TextToSpeechManager? = null
 
+    // משתנה לטיפול בתוצאה החוזרת ממסך הוספת משימה
     private val addTaskLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             val data = result.data
             if (data != null) {
-                // We rely on MainActivity to have handled logic OR we handle it here.
-                // Actually, the Intent result usually goes to whoever launched it.
-                // So we copy the logic from MainActivity here.
+                // אנו מסתמכים על MainActivity או מטפלים בזה כאן.
+                // למעשה, תוצאת ה-Intent מגיעה למי שיזם אותה.
+                // אז נשכפל את הלוגיקה מכאן.
                 val title = data.getStringExtra(AddTaskActivity.EXTRA_TITLE)
                 val description = data.getStringExtra(AddTaskActivity.EXTRA_DESCRIPTION)
                 val dueDate = data.getStringExtra(AddTaskActivity.EXTRA_DUE_DATE)
@@ -67,6 +96,7 @@ class TaskListFragment : Fragment() {
         }
     }
 
+    // פונקציה ליצירת התצוגה של הפרגמנט
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -75,6 +105,7 @@ class TaskListFragment : Fragment() {
         return binding.root
     }
 
+    // פונקציה הנקראת לאחר שהתצוגה נוצרה, משמשת לאיתחול לוגיקה
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -97,7 +128,11 @@ class TaskListFragment : Fragment() {
         }
     }
 
+    // פונקציה להגדרת ה-RecyclerView וה-Adapter
     private fun setupRecyclerView() {
+        // אתחול מנהל TTS
+        ttsManager = TextToSpeechManager(requireContext())
+
         taskAdapter = TaskAdapter(
             emptyList(),
             onTaskClick = { task ->
@@ -110,6 +145,11 @@ class TaskListFragment : Fragment() {
             },
             onTaskDelete = { task ->
                 viewModel.deleteTask(task)
+            },
+            onTaskSpeak = { task ->
+                // בניית הטקסט המדובר והקראה
+                val spokenText = buildSpokenText(task)
+                ttsManager?.speak(spokenText)
             }
         )
         binding.recyclerTasks.layoutManager = LinearLayoutManager(requireContext())
@@ -117,20 +157,23 @@ class TaskListFragment : Fragment() {
         setupSwipeToDelete(binding.recyclerTasks)
     }
 
+    // פונקציה להגדרת המחוות של החלקה למחיקה/השלמה
     private fun setupSwipeToDelete(recyclerView: RecyclerView) {
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
             0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
             private val deleteColor = Color.RED
-            private val completeColor = Color.parseColor("#4CAF50") // Green
+            private val completeColor = Color.parseColor("#4CAF50") // ירוק
             private val paint = Paint()
 
+            // פונקציה לטיפול בגרירה (לא בשימוש כאן)
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean = false
 
+            // פונקציה לציור הרקע והאייקון בזמן החלקה
             override fun onChildDraw(
                 c: Canvas,
                 recyclerView: RecyclerView,
@@ -142,7 +185,7 @@ class TaskListFragment : Fragment() {
             ) {
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                     val itemView = viewHolder.itemView
-                    val iconMargin = (itemView.height - 50) / 2 // Approximate margin
+                    val iconMargin = (itemView.height - 50) / 2 // שוליים משוערים
                     val textPaint = Paint().apply {
                         color = Color.WHITE
                         textSize = 40f
@@ -150,15 +193,15 @@ class TaskListFragment : Fragment() {
                         textAlign = Paint.Align.LEFT
                     }
 
-                    if (dX > 0) { // Right Swipe (Complete)
-                        // Background
+                    if (dX > 0) { // החלקה ימינה (השלמה)
+                        // רקע
                         paint.color = completeColor
                         c.drawRect(
                             itemView.left.toFloat(), itemView.top.toFloat(),
                             dX, itemView.bottom.toFloat(), paint
                         )
                         
-                        // Icon
+                        // אייקון
                         val icon = androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.ic_check)
                         icon?.let {
                             val iconTop = itemView.top + (itemView.height - it.intrinsicHeight) / 2
@@ -166,23 +209,23 @@ class TaskListFragment : Fragment() {
                             val iconLeft = itemView.left + iconMargin
                             val iconRight = iconLeft + it.intrinsicWidth
                             it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                            // Only draw if swipe is large enough
+                            // ציור רק אם ההחלקה גדולה מספיק
                             if (dX > iconRight + 20) {
                                 it.draw(c)
-                                // Text
+                                // טקסט
                                 c.drawText("Completed", (iconRight + 20).toFloat(), (itemView.top + itemView.bottom) / 2f + 15, textPaint)
                             }
                         }
 
-                    } else if (dX < 0) { // Left Swipe (Delete)
-                        // Background
+                    } else if (dX < 0) { // החלקה שמאלה (מחיקה)
+                        // רקע
                         paint.color = deleteColor
                         c.drawRect(
                             itemView.right.toFloat() + dX, itemView.top.toFloat(),
                             itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                         )
 
-                        // Icon
+                        // אייקון
                         val icon = androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
                         icon?.let {
                             val iconTop = itemView.top + (itemView.height - it.intrinsicHeight) / 2
@@ -191,10 +234,10 @@ class TaskListFragment : Fragment() {
                             val iconLeft = iconRight - it.intrinsicWidth
                             it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
                             
-                            // Only draw if swipe is large enough
+                            // ציור רק אם ההחלקה גדולה מספיק
                             if (-dX > (itemView.right - iconLeft) + 20) {
                                 it.draw(c)
-                                // Text
+                                // טקסט
                                 textPaint.textAlign = Paint.Align.RIGHT
                                 c.drawText("Delete", (iconLeft - 20).toFloat(), (itemView.top + itemView.bottom) / 2f + 15, textPaint)
                             }
@@ -204,6 +247,7 @@ class TaskListFragment : Fragment() {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
 
+            // פונקציה הנקראת בסיום ההחלקה
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val task = taskAdapter.getTask(position)
@@ -240,6 +284,7 @@ class TaskListFragment : Fragment() {
         ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)
     }
 
+    // פונקציה להגדרת הספינר לבחירת מיון
     private fun setupSortSpinner() {
         ArrayAdapter.createFromResource(
             requireContext(),
@@ -255,7 +300,7 @@ class TaskListFragment : Fragment() {
             SortOption.BY_DATE -> 0
             SortOption.BY_PRIORITY -> 1
             SortOption.SMART_SORT -> 2
-            else -> 0 // Safety: Default to 0 if unknown or DEFAULT
+            else -> 0 // בטיחות: ברירת מחדל ל-0 אם לא ידוע
         }
         if (position in 0 until binding.spinnerSort.adapter.count) {
             binding.spinnerSort.setSelection(position, false)
@@ -275,7 +320,28 @@ class TaskListFragment : Fragment() {
         }
     }
 
+    // פונקציה לבניית טקסט מדובר מפרטי המשימה
+    private fun buildSpokenText(task: com.example.taskmasterfinalproject.model.Task): String {
+        val sb = StringBuilder()
+        sb.append(getString(R.string.tts_task_prefix))
+        sb.append(task.title ?: "")
+        if (!task.description.isNullOrBlank()) {
+            sb.append(". ")
+            sb.append(getString(R.string.tts_description_prefix))
+            sb.append(task.description)
+        }
+        if (!task.dueDate.isNullOrBlank()) {
+            sb.append(". ")
+            sb.append(getString(R.string.tts_due_date_prefix))
+            sb.append(task.dueDate)
+        }
+        return sb.toString()
+    }
+
+    // נקראת כשהתצוגה נהרסת, לניקוי משאבים
     override fun onDestroyView() {
+        ttsManager?.shutdown()
+        ttsManager = null
         super.onDestroyView()
         _binding = null
     }

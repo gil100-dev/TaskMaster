@@ -1,15 +1,25 @@
 package com.example.taskmasterfinalproject.views
 
+// ספרייה לגישה למשאבי המערכת
 import android.content.Context
+// ספרייה לציור על גבי המסך
 import android.graphics.Canvas
+// ספרייה לניהול צבעים
 import android.graphics.Color
+// ספרייה להגדרת כלי ציור (מכחול)
 import android.graphics.Paint
+// ספרייה להגדרת מלבן בפורמט Float
 import android.graphics.RectF
+// ספרייה לניהול תכונות (Attributes) מ-XML
 import android.util.AttributeSet
+// מחלקת הבסיס לכל רכיב תצוגה
 import android.view.View
+// משאבי האפליקציה
 import com.example.taskmasterfinalproject.R
+// ספרייה לפונקציות מתמטיות (min)
 import kotlin.math.min
 
+// רכיב תצוגה מותאם אישית המציג טבעת התקדמות מעגלית
 class CompletionRingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -19,7 +29,7 @@ class CompletionRingView @JvmOverloads constructor(
     private var progress: Int = 0
     private var maxProgress: Int = 100
 
-    // Paints
+    // הגדרת המכחולים (Paints) לציור
     private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
     }
@@ -31,17 +41,18 @@ class CompletionRingView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
     }
 
-    // Dimensions & Colors (Defaults)
+    // מידות וצבעים (ברירות מחדל)
     private var ringThickness = 20f
     private var ringColor = Color.LTGRAY
     private var progressColor = Color.BLUE
     private var textColor = Color.BLACK
     private var textSize = 40f
 
-    // Drawing Rect
+    // מלבן עזר לציור הקשת
     private val rectF = RectF()
 
     init {
+        // טעינת תכונות מותאמות אישית מ-XML
         context.theme.obtainStyledAttributes(
             attrs,
             R.styleable.CompletionRingView,
@@ -59,7 +70,7 @@ class CompletionRingView @JvmOverloads constructor(
             }
         }
 
-        // Apply config
+        // החלת הגדרות על המכחולים
         ringPaint.strokeWidth = ringThickness
         ringPaint.color = ringColor
 
@@ -70,8 +81,9 @@ class CompletionRingView @JvmOverloads constructor(
         textPaint.textSize = textSize
     }
 
+    // פונקציה למדידת גודל הרכיב
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // Enforce a minimum size if wrap_content used
+        // אכיפת גודל מינימלי במידה ומוגדר wrap_content
         val desiredSize = (120 * resources.displayMetrics.density).toInt()
         
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -94,38 +106,40 @@ class CompletionRingView @JvmOverloads constructor(
         setMeasuredDimension(width, height)
     }
 
+    // פונקציה לציור הרכיב על המסך
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         val w = width.toFloat()
         val h = height.toFloat()
         
-        // Center coordinates
+        // נקודת המרכז
         val cx = w / 2
         val cy = h / 2
         
-        // Radius is half of min dim minus padding/thickness
+        // רדיוס הוא חצי מהמימד הקטן ביותר פחות העובי
         val radius = (min(w, h) / 2) - ringThickness
 
         rectF.set(cx - radius, cy - radius, cx + radius, cy + radius)
 
-        // Draw background ring (full circle)
+        // ציור טבעת הרקע (עיגול מלא)
         canvas.drawOval(rectF, ringPaint)
 
-        // Draw progress arc
-        // Start from top (-90 degrees)
+        // ציור קשת ההתקדמות
+        // מתחיל מלמעלה (-90 מעלות)
         val sweepAngle = 360f * (progress / maxProgress.toFloat())
         canvas.drawArc(rectF, -90f, sweepAngle, false, progressPaint)
 
-        // Draw Percentage Text
+        // ציור טקסט האחוזים
         val text = "$progress%"
-        // Vertically center text: descend + ascend is the height of text relative to baseline
+        // מירכוז אנכי של הטקסט
         val textOffset = (textPaint.descent() + textPaint.ascent()) / 2
         canvas.drawText(text, cx, cy - textOffset, textPaint)
     }
 
+    // פונקציה לעדכון ערך ההתקדמות
     fun setProgress(value: Int) {
         this.progress = value.coerceIn(0, maxProgress)
-        invalidate() // Redraw
+        invalidate() // בקשה לציור מחדש
     }
 }

@@ -69,6 +69,18 @@
             app:layout_constraintTop_toTopOf="@+id/text_task_priority"
             tools:text="Tomorrow, 10:00" />
 
+        <ImageButton
+            android:id="@+id/button_speak_task"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/speak_task"
+            android:src="@drawable/ic_speaker"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_complete_task"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_complete_task"
             style="@style/Widget.Material3.Button.IconButton"

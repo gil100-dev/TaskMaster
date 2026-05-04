@@ -1,8 +1,10 @@
 package com.example.taskmasterfinalproject.model
 
+// מחלקת Enum המגדירה את אפשרויות המיון הזמינות באפליקציה.
+// Enum הוא סוג נתונים שמכיל קבוצה קבועה של ערכים – בטוח לשימוש ב-when כי הקומפיילר מוודא כיסוי מלא
 enum class SortOption {
-    BY_DATE,
-    BY_PRIORITY,
-    SMART_SORT,
-    DEFAULT
+    BY_DATE,        // מיון לפי תאריך יעד (מהקרוב לרחוק)
+    BY_PRIORITY,    // מיון לפי עדיפות (מהגבוהה לנמוכה)
+    SMART_SORT,     // מיון חכם – משלב עדיפות, קרבה לדדליין ודחיפות לציון מספרי
+    DEFAULT         // ברירת מחדל – לפי תאריך יצירה (מהחדש לישן)
 }

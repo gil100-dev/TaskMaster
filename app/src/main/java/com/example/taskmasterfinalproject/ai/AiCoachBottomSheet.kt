@@ -1,34 +1,50 @@
 package com.example.taskmasterfinalproject.ai
 
+// מעביר מידע בין רכיבים
 import android.os.Bundle
+// משמש לניפוח (Inflate) קבצי XML לתצוגה
 import android.view.LayoutInflater
+// רכיבי תצוגה
 import android.view.View
 import android.view.ViewGroup
+// קישוריות לתצוגה (ViewBinding)
 import com.example.taskmasterfinalproject.databinding.FragmentAiCoachBottomSheetBinding
+// מודל המשימה
 import com.example.taskmasterfinalproject.model.Task
+// התנהגות החלונית התחתונה
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+// דיאלוג החלונית התחתונה
 import com.google.android.material.bottomsheet.BottomSheetDialog
+// מחלקת בסיס לחלונית תחתונה (Bottom Sheet)
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+// האצלת יצירת ViewModel
 import androidx.fragment.app.viewModels
 
+// חלונית תחתונה המציגה את עצות ה-AI עבור משימה
 class AiCoachBottomSheet : BottomSheetDialogFragment() {
 
+    // _binding – nullable כדי למנוע דליפות זיכרון (מתאפס ב-onDestroyView)
     private var _binding: FragmentAiCoachBottomSheetBinding? = null
+    // גישה נוחה ל-Binding (!! כי משתמשים רק כשהתצוגה קיימת)
     private val binding get() = _binding!!
+    // ViewModel שמנהל את הלוגיקה – by viewModels() = השמדה אוטומטית כשהפרגמנט נהרס
     private val viewModel: AiViewModel by viewModels()
 
     private var taskTitle: String = ""
     private var taskDesc: String = ""
     private var taskPriority: Int = 0
 
+    // אובייקט נלווה (Companion Object) – מכיל קבועים וFactory Method.
+    // קבועים אלו משמשים כמפתחות להעברת נתונים ב-Bundle (דפוס Arguments)
     companion object {
-        const val TAG = "AiCoachBottomSheet"
-        private const val ARG_TITLE = "arg_title"
-        private const val ARG_DESC = "arg_desc"
-        private const val ARG_PRIORITY = "arg_priority"
-        private const val ARG_SUBTASKS = "arg_subtasks"
-        private const val ARG_TASK_ID = "arg_task_id"
+        const val TAG = "AiCoachBottomSheet"        // תגית לזיהוי ב-FragmentManager
+        private const val ARG_TITLE = "arg_title"   // מפתח לכותרת המשימה
+        private const val ARG_DESC = "arg_desc"     // מפתח לתיאור המשימה
+        private const val ARG_PRIORITY = "arg_priority"  // מפתח לעדיפות
+        private const val ARG_SUBTASKS = "arg_subtasks"  // מפתח לרשימת תת-משימות
+        private const val ARG_TASK_ID = "arg_task_id"    // מפתח למזהה המשימה
 
+        // יוצר מופע חדש של החלונית עם נתונים התחלתיים
         fun newInstance(task: Task?, subtasks: List<String> = emptyList()): AiCoachBottomSheet {
             val fragment = AiCoachBottomSheet()
             val args = Bundle()
@@ -50,6 +66,7 @@ class AiCoachBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    // אתחול ראשוני וקריאת ארגומנטים
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -64,6 +81,7 @@ class AiCoachBottomSheet : BottomSheetDialogFragment() {
     private var taskId: String = ""
     private var subtaskList: List<String> = emptyList()
 
+    // טעינת הממשק הגרפי (Layout)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,27 +90,37 @@ class AiCoachBottomSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    // Callback חיצוני – מאפשר ל-Activity שפתח את החלונית לטפל בהוספת תת-משימות
     var onApplySubtasks: ((List<AiSubtask>) -> Unit)? = null
 
+    // הגדרת לוגיקה ומאזינים לאחר יצירת התצוגה
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val prefs = com.example.taskmasterfinalproject.data.PreferencesManager(requireContext())
 
-        // UI Setup
-        binding.btnClose.setOnClickListener { dismiss() }
+        // הגדרת ממשק המשתמש ומאזינים
+        binding.btnClose.setOnClickListener { dismiss() }  // dismiss() – סגירת החלונית
         
+        // כפתור יצירת עצה חדשה – מנקה את המטמון כדי לכפות תוכן חדש
         binding.btnRegenerate.setOnClickListener {
+            // ניקוי המטמון כדי לאפשר עצה חדשה עם תתי-משימות מעודכנות
+            if (taskId.isNotEmpty()) {
+                prefs.saveAiAdvice(taskId, "")
+            }
             viewModel.generateAdvice(taskTitle, taskDesc, taskPriority, subtaskList)
         }
 
+        // כפתור יצירת תוכנית תת-משימות באמצעות AI
         binding.btnGenerateSubtasks.setOnClickListener {
             viewModel.generateSubtasksPlan(taskTitle, taskDesc, taskPriority)
         }
 
+        // כפתור ביטול – מאפס את התוכנית שנוצרה
         binding.btnDiscard.setOnClickListener {
              viewModel.clearPlan()
         }
 
+        // כפתור אישור – מחיל את תת-המשימות שנוצרו על המשימה המקורית
         binding.btnApply.setOnClickListener {
             viewModel.subtaskPlan.value?.let { plan ->
                 onApplySubtasks?.invoke(plan.subtasks)
@@ -101,7 +129,8 @@ class AiCoachBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
-        // Observe ViewModel
+        // דפוס Observer – האזנה לשינויים ב-LiveData מתוך ה-ViewModel.
+        // observe() מחובר ל-viewLifecycleOwner ולכן מתבטל אוטומטית כשהתצוגה נהרסת
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBarAi.visibility = if (loading) View.VISIBLE else View.GONE
             if (loading) {
@@ -119,8 +148,7 @@ class AiCoachBottomSheet : BottomSheetDialogFragment() {
                 binding.textAiResponse.text = androidx.core.text.HtmlCompat.fromHtml(
                     response, androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
                 )
-                // Save to Cache if it's a valid response (not loading message or error)
-                // Simple heuristic: if length > 50 and not starting with "AI Error" or "Connecting"
+                // לוגיקת שמירה למטמון (Caching): שומר תשובה אם היא "אמיתית" (לא הודעת טעינה)
                 if (response.length > 50 && !response.startsWith("AI Error") && !response.startsWith("Connecting") && !response.startsWith("Thinking")) {
                     if (taskId.isNotEmpty()) {
                         prefs.saveAiAdvice(taskId, response)
@@ -150,17 +178,18 @@ class AiCoachBottomSheet : BottomSheetDialogFragment() {
              }
         }
 
-        // Init Logic: Check Cache or Generate
+        // לוגיקת אתחול: בדיקת מטמון לפני פנייה ל-AI (חוסך זמן ותעבורת רשת)
         if (viewModel.aiResponse.value.isNullOrBlank() && viewModel.subtaskPlan.value == null) {
             val cached = if (taskId.isNotEmpty()) prefs.getAiAdvice(taskId) else null
             if (!cached.isNullOrBlank()) {
-                 viewModel.setCachedResponse(cached)
+                 viewModel.setCachedResponse(cached)  // טעינה מהמטמון
             } else {
-                 viewModel.generateAdvice(taskTitle, taskDesc, taskPriority, subtaskList)
+                 viewModel.generateAdvice(taskTitle, taskDesc, taskPriority, subtaskList)  // פנייה ל-AI
             }
         }
     }
     
+    // הגדרת גובה החלונית במצב מכווץ
     override fun onStart() {
         super.onStart()
         // Set peek height to ~1/6 screen (Compact)
@@ -171,6 +200,7 @@ class AiCoachBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    // ניקוי הפניות למניעת דליפות זיכרון
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

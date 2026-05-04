@@ -1,16 +1,27 @@
 package com.example.taskmasterfinalproject.auth
 
+// ספרייה לקבלת ה-Context של האפליקציה ב-ViewModel
 import android.app.Application
+// מחלקת ViewModel בסיסית המקבלת Application
 import androidx.lifecycle.AndroidViewModel
+// ספרייה לייצוג נתונים ברי-צפייה (לקריאה בלבד)
 import androidx.lifecycle.LiveData
+// ספרייה לייצוג נתונים ברי-צפייה וניתנים לשינוי
 import androidx.lifecycle.MutableLiveData
+// ספרייה לניהול Coroutines בתוך ה-ViewModel
 import androidx.lifecycle.viewModelScope
+// ה-Repository המטפל באימות
 import com.example.taskmasterfinalproject.data.AuthRepository
+// מנהל ההעדפות
 import com.example.taskmasterfinalproject.data.PreferencesManager
+// מסד הנתונים
 import com.example.taskmasterfinalproject.db.TaskDatabase
+// המודל המייצג משתמש
 import com.example.taskmasterfinalproject.model.User
+// ספרייה להרצת קורוטינות
 import kotlinx.coroutines.launch
 
+// ViewModel עבור מסכי האימות (התחברות, הרשמה, פרופיל)
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: AuthRepository
@@ -28,6 +39,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         prefs = PreferencesManager(application)
     }
 
+    // פונקציה לביצוע התחברות
     fun login(username: String, pass: String, rememberMe: Boolean) {
         if (username.isBlank() || pass.isBlank()) {
             _authResult.value = Result.failure(Exception("Please fill all fields"))
@@ -52,38 +64,34 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // פונקציה לביצוע הרשמה
     fun register(username: String, pass: String) {
         if (username.isBlank() || pass.isBlank()) {
             _authResult.value = Result.failure(Exception("Please fill all fields"))
             return
         }
-        if (pass.length < 4) {
-             _authResult.value = Result.failure(Exception("Password too short (min 4 chars)"))
+        if (pass.length < 6) {
+             _authResult.value = Result.failure(Exception("הסיסמה קצרה מדי (מינימום 6 תווים)"))
              return
         }
 
         _isLoading.value = true
         viewModelScope.launch {
             val result = repository.register(username, pass)
-            // Auto login on register? No, maybe just success message or auto-login.
-            // Requirement says "On Login:... create session".
-            // Usually Register -> Auto Login is good UX.
-            // I'll auto-login (no remember me by default unless we add checkbox to register, but simpler to just return success and let user login, OR auto login without remember me)
-            // Let's just return success. User can Login. 
-            // Better: If register success, emit success. Activity can decide to auto-login or ask user to login.
-            // I'll leave it as Result<User>. The activity can handle navigation.
+            // אם ההרשמה הצליחה, מחזירים תוצאה חיובית. המשתמש יידרש להתחבר ידנית או שהמסך יטפל בזה.
             _authResult.value = result
             _isLoading.value = false
         }
     }
     
+    // פונקציה לשינוי סיסמה (גרסה פנימית ישנה שנותרה, ראה changePasswordAction)
     fun changePassword(userId: Long, oldPass: String, newPass: String) {
         if (oldPass.isBlank() || newPass.isBlank()) {
             _authResult.value = Result.failure(Exception("Please fill all fields"))
             return
         }
-        if (newPass.length < 4) {
-             _authResult.value = Result.failure(Exception("New password too short"))
+        if (newPass.length < 6) {
+             _authResult.value = Result.failure(Exception("הסיסמה החדשה קצרה מדי"))
              return
         }
         
@@ -91,23 +99,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val result = repository.changePassword(userId, oldPass, newPass)
             if (result.isSuccess) {
-                 // Password changed
+                 // סיסמה שונתה
             }
-            // We use same authResult for simplicity or specialized LiveData?
-            // Reuse authResult (contains User? ChangePassword returns Unit).
-            // I'll make authResult more generic or add _passwordChangeResult.
-            // Using _authResult with null user or just boolean? Result<User> implies User.
-            // I'll add `passwordChangeResult`.
         }
     }
     
     private val _passwordChangeResult = MutableLiveData<Result<Unit>>()
     val passwordChangeResult: LiveData<Result<Unit>> = _passwordChangeResult
     
-    // Updated implementation for changePassword to use new LiveData
+    // פונקציה לשינוי סיסמה בפועל, המעדכנת את ה-LiveData הייעודי
     fun changePasswordAction(userId: Long, oldPass: String, newPass: String) {
         if (oldPass.isBlank() || newPass.isBlank()) {
-            _passwordChangeResult.value = Result.failure(Exception("Please fill all fields"))
+            _passwordChangeResult.value = Result.failure(Exception("נא למלא את כל השדות"))
             return
         }
         _isLoading.value = true
@@ -118,9 +121,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
+    // משתנה LiveData להחזקת פרטי המשתמש הנוכחי
     private val _user = MutableLiveData<User?>()
     val user: LiveData<User?> = _user
 
+    // פונקציה לטעינת פרטי משתמש לפי מזהה
     fun loadUser(userId: Long) {
         viewModelScope.launch {
             val u = repository.getUser(userId)

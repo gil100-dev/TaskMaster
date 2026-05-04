@@ -48,12 +48,28 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp">
 
-            <TextView
-                android:id="@+id/textAiResponse"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="I can help you break down this task or provide motivation. Tap 'Ask' to start."
-                android:textAppearance="?attr/textAppearanceBodyMedium" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textAiResponse"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="I can help you break down this task or provide motivation. Tap 'Ask' to start."
+                    android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+                <Button
+                    android:id="@+id/btnRegenerate"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="ייצר עצה מחדש"
+                    app:icon="@android:drawable/ic_popup_sync"
+                    app:iconGravity="textStart" />
+            </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 
@@ -116,25 +132,19 @@
         <Button
             android:id="@+id/btnGenerateSubtasks"
             style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="Create Subtasks" />
-
-        <Button
-            android:id="@+id/btnRegenerate"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="Regenerate Advice" />
+            android:layout_marginEnd="4dp"
+            android:text="צור תת-משימות" />
 
         <Button
             android:id="@+id/btnClose"
             style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Close" />
+            android:text="סגור" />
     </LinearLayout>
 
 </LinearLayout>

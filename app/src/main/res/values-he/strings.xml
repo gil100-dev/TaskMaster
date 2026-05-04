@@ -14,4 +14,29 @@
     <string name="no_tasks_message">לא נמצאו משימות. הוסף אחת!</string>
     <string name="add_subtask">הוסף תת-משימה</string>
     <string name="error_empty_title">הכותרת לא יכולה להיות ריקה</string>
+    
+    <!-- Auth Strings -->
+    <string name="login_title">כניסה</string>
+    <string name="hint_username">שם משתמש</string>
+    <string name="hint_password">סיסמה</string>
+    <string name="hint_confirm_password">אמת סיסמה</string>
+    <string name="remember_me">זכור אותי</string>
+    <string name="action_login">כניסה</string>
+    <string name="action_register">הרשמה</string>
+    <string name="action_create_account">צור חשבון</string>
+    <string name="action_back_to_login">חזרה לכניסה</string>
+    <string name="error_fill_fields">נא למלא את כל השדות</string>
+    <string name="error_password_mismatch">הסיסמאות אינן תואמות</string>
+    <string name="error_username_exists">שם המשתמש כבר קיים</string>
+    <string name="msg_register_success">החשבון נוצר בהצלחה! נא להתחבר.</string>
+    
+    <!-- Profile Strings -->
+    <string name="profile_title">פרופיל</string>
+    <string name="action_change_password">שנה סיסמה</string>
+    <string name="action_logout">התנתק</string>
+    <string name="hint_old_password">סיסמה ישנה</string>
+    <string name="hint_new_password">סיסמה חדשה</string>
+    <string name="msg_password_changed">הסיסמה שונתה בהצלחה</string>
+    <string name="password_changed">הסיסמה שונתה בהצלחה</string>
+    <string name="settings_title">הגדרות</string>
 </resources>
